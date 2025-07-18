@@ -205,3 +205,165 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+# Environment Variables & Secrets
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.*.local
+.envrc
+
+# API Keys & Credentials
+*.key
+*.pem
+*.p12
+*.pfx
+credentials.json
+service-account*.json
+client_secret*.json
+token.json
+refresh_token.json
+secrets.json
+config.json
+.secrets/
+
+# Cloud Provider Credentials
+.aws/
+.gcp/
+.azure/
+.digitalocean/
+.vercel/
+.netlify/
+
+# AI Model Files (often large)
+*.pkl
+*.joblib
+*.h5
+*.hdf5
+*.pb
+*.onnx
+*.tflite
+*.pt
+*.pth
+*.safetensors
+models/
+checkpoints/
+weights/
+
+# Training Data & Datasets
+data/
+datasets/
+training_data/
+*.csv
+*.json
+*.parquet
+*.feather
+*.xlsx
+*.sqlite
+*.db
+
+# Logs & Monitoring
+logs/
+*.log
+*.log.*
+crash.log
+error.log
+debug.log
+audit.log
+
+# Cache & Temporary Files
+cache/
+tmp/
+temp/
+.cache/
+.tmp/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.coverage
+.nyc_output
+
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.yarn/
+.pnp.*
+
+# Python
+venv/
+env/
+ENV/
+.venv/
+.env/
+pip-log.txt
+pip-delete-this-directory.txt
+.tox/
+.nox/
+.coverage
+.pytest_cache/
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*/.ipynb_checkpoints/*
+
+# IDE & Editor Files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Build & Distribution
+build/
+dist/
+*.egg-info/
+.eggs/
+
+# Docker
+.docker/
+docker-compose.override.yml
+Dockerfile.local
+
+# n8n Specific
+n8n-user-data/
+.n8n/
+n8n.db
+
+# Automation Platforms
+.zapier/
+.make/
+.automate/
+
+# Vector Databases
+.chroma/
+.pinecone/
+.weaviate/
+.qdrant/
+vector_store/
+
+# Large Files (use Git LFS instead)
+*.mp4
+*.avi
+*.mov
+*.wav
+*.mp3
+*.zip
+*.tar.gz
+*.rar
+
+# Backup Files
+*.backup
+*.bak
+*.old
+*.orig
