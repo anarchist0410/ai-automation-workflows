@@ -61,7 +61,7 @@ This project is an end-to-end automated product video generator built using n8n,
 
 ## 🧪 Sample Output
 
-> Input: Image + Description of a sports watch  
+> Input: Image + Description of a Cologne 
 > Output: 10-second AI-rendered video with branded animation and visuals, delivered via email.
 
 ---
