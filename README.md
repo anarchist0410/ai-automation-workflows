@@ -6,7 +6,7 @@ This repository is a growing collection of AI-powered workflows and automations 
 
 ## 📂 Projects
 
-### 1. 🎬 [AI Product Video Generator](workflows/product-video-generator_n8n)
+### 1. 🎬 [AI Product Video Generator](Workflows/product-video-generator_n8n)
 Automatically generates promotional videos from product images/descriptions using OpenAI + RunwayML.
 
 ### 2. 🛠 Smart Maintenance Assistant *(Coming Soon)*
