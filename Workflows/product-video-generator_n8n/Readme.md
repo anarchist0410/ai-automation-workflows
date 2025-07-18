@@ -55,7 +55,7 @@ This project is an end-to-end automated product video generator built using n8n,
 
 ## 📸 Workflow Diagram
 
-![Workflow Screenshot](assets/workflow-diagram.png)
+![Workflow Screenshot](assets/product_videography_n8n_SS.png)
 
 ---
 
