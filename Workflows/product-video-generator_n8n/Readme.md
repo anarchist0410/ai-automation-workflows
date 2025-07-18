@@ -60,7 +60,8 @@ This project is an end-to-end automated product video generator built using n8n,
 ---
 
 ## 🧪 Sample Output
-
+[Product Imahe](
+[Product Video](Workflows/product-video-generator_n8n/assets/producr_video.mp4)
 > Input: Image + Description of a Cologne 
 > Output: 10-second AI-rendered video with branded animation and visuals, delivered via email.
 
