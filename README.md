@@ -9,8 +9,8 @@ This repository is a growing collection of AI-powered workflows and automations 
 ### 1. 🎬 [AI Product Video Generator](Workflows/product-video-generator_n8n)
 Automatically generates promotional videos from product images/descriptions using OpenAI + RunwayML.
 
-### 2. 🛠 Smart Maintenance Assistant *(Coming Soon)*
-Predictive maintenance workflow with fault detection, schedule automation, and AI support for operators.
+### 2. 🛠 Ultimate RAG-based AI Voice Agent & Lead Reactivation System 
+
 
 ---
 
