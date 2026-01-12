@@ -1,0 +1,300 @@
+# Ultimate RAG-based AI Voice Agent & Lead Reactivation System
+
+## Overview
+
+This is a sophisticated **AI-powered appointment scheduling system** for "The Glow Clinic" that combines **Vapi** (Voice AI platform) with **n8n** (workflow automation) to create an intelligent phone receptionist. The system can handle appointment bookings, rescheduling, cancellations, and answer questions about the clinic - all through natural voice conversations in multiple languages.
+
+---
+
+## The Vapi AI Agent - "Chloe"
+
+[Vapi Agent prompt ](https://www.notion.so/Vapi-Agent-prompt-2e6dddf22163805fb3f8f33220de2bb7?pvs=21)
+
+[Vapi Tools](https://www.notion.so/Vapi-Tools-2e6dddf22163808f8918d8dc8afc2a32?pvs=21)
+
+**What it does:** Chloe is a multilingual AI voice assistant that acts as The Glow Clinic's patient coordinator.
+
+**Key capabilities:**
+
+### 1. **Multilingual Support**
+
+- Automatically detects the caller's language (Spanish, French, Arabic, German, Hindi, English, etc.)
+- Can switch languages mid-conversation if requested
+- Properly formats dates, times, and information according to local conventions
+
+### 2. **Smart Caller Recognition**
+
+- Automatically looks up callers by phone number at the start of each call
+- Greets returning clients by name: "Welcome back, Sarah!"
+- Treats new callers differently with a qualification process
+
+### 3. **Conversation Flow**
+
+The agent follows a strict conversational playbook:
+
+**For New Clients:**
+
+1. Asks what treatment they're interested in (Botox, fillers, etc.)
+2. Checks if they've had the treatment before
+3. Offers a complimentary consultation
+4. Checks available time slots
+5. Books the appointment after confirming details
+6. Sends confirmation SMS
+
+**For Existing Clients:**
+
+- Book new appointments
+- Reschedule existing appointments
+- Cancel appointments
+- Answer questions about clinic services
+
+### 4. **Information Assistant**
+
+- Can answer questions about clinic hours, services, pricing, location, etc.
+- Uses the `getUserDocuments` tool to search through clinic documentation
+- Seamlessly returns to the booking flow after answering questions
+
+### 5. **Tools Available to the Agent**
+
+1. **lookupClientByPhone** - Identifies if caller is new or returning
+2. **qualifyNewClient** - Records treatment interest and experience
+3. **checkAvailability** - Finds open appointment slots
+4. **bookAppointment** - Creates new appointments
+5. **rescheduleAppointment** - Moves existing appointments
+6. **cancelAppointment** - Cancels appointments
+7. **getUserDocuments** - Retrieves clinic information from knowledge base
+
+---
+
+## n8n Workflow #1: "Ultimate AI Agent"
+
+![Screenshot 2026-01-12 134107.png](Screenshot_2026-01-12_134107.png)
+
+### Purpose
+
+This is the **main orchestration workflow** that powers Chloe. It receives tool calls from Vapi and executes the appropriate actions.
+
+### How it works (Step-by-step):
+
+1. **Webhook Trigger:** Receives incoming requests from Vapi when the AI needs to use a tool
+2. **Message Type Router:** Determines if this is:
+    - A tool call during the conversation
+    - An end-of-call report (for analytics)
+3. **Tool Name Router:** Routes to the appropriate action based on which tool Chloe called:
+    
+    **A. Check Availability Flow:**
+    
+    - Calculates all possible time slots for the requested day (8 AM - 6 PM in 30-minute intervals)
+    - Fetches existing appointments from Google Calendar
+    - Filters out busy times (with buffer periods before/after)
+    - Returns available slots in human-readable format
+    
+    **B. Book Appointment Flow:**
+    
+    - Creates event in Google Calendar
+    - Sends confirmation SMS via Twilio
+    - **CRM Router** decides whether to use:
+        - Google Sheets (simple setup) OR
+        - HubSpot (professional CRM)
+    - For Google Sheets: Adds/updates contact in spreadsheet
+    - For HubSpot: Creates contact and deal pipeline entry
+    - Returns success confirmation to Vapi
+    
+    **C. Reschedule Appointment:**
+    
+    - Finds existing appointment in Google Calendar
+    - Updates the appointment time
+    - Sends SMS confirmation
+    - Updates CRM records
+    - Returns confirmation
+    
+    **D. Cancel Appointment:**
+    
+    - Finds appointment in Google Calendar
+    - Deletes the event
+    - Sends cancellation SMS
+    - Updates CRM with cancellation status
+    - Returns confirmation
+    
+    **E. Qualify New Client:**
+    
+    - Simply logs that qualification happened
+    - Returns acknowledgment (actual data stored in call transcript)
+    
+    **F. Lookup Client by Phone:**
+    
+    - Searches CRM (Google Sheets or HubSpot) by phone number
+    - Returns client information if found
+    - Returns empty if new caller
+    
+    **G. Get User Documents (RAG):**
+    
+    - Forwards question to the RAG AI Agent workflow
+    - Returns relevant information from clinic knowledge base
+4. **End-of-Call Processing:**
+    - When call ends, finds the appointment in calendar
+    - Updates event description with AI-generated call summary
+    - Logs call quality evaluation to Google Sheets
+
+### Key Features:
+
+- **Dual CRM Support:** Works with both simple (Google Sheets) and professional (HubSpot) systems
+- **Configurable Variables:** Business hours, timezone, buffer times, meeting duration
+- **SMS Confirmations:** Automatic text messages for all booking actions
+- **Error Handling:** Retry logic on critical nodes
+- **Call Analytics:** Tracks call quality and outcomes
+
+---
+
+## n8n Workflow #2: "Lead Reactivation"
+
+![Screenshot 2026-01-12 134327.png](Screenshot_2026-01-12_134327.png)
+
+### Purpose
+
+**Automated cold calling system** that uses Vapi to call dormant leads and try to book appointments.
+
+### How it works:
+
+1. **Schedule Trigger:** Runs daily at 11 AM
+2. **Configuration:** Sets Vapi API credentials and assistant ID
+3. **Get Leads to Call:**
+    - Reads Google Sheet of clinic contacts
+    - Filters for rows where "Cold Call Sent" column is empty
+    - These are leads who haven't been called yet
+4. **Limit to 100:** Safety feature to avoid calling too many people
+5. **Loop Over Items:** Processes leads in batches
+6. **Vapi Caller:** For each lead:
+    - Calls Vapi's API to initiate an outbound call
+    - Uses the same AI assistant (Chloe) to have the conversation
+    - Chloe tries to book them for a consultation
+7. **Update Sheet:** Marks "Cold Call Sent" as "yes" after calling
+8. **Wait 1 Minute:** Paces calls to avoid overwhelming the system
+
+### Use Case:
+
+Perfect for re-engaging leads who inquired but never booked, or for proactive outreach campaigns.
+
+---
+
+## n8n Workflow #3: "RAG Voice AI"
+
+![Screenshot 2026-01-12 134246.png](Screenshot_2026-01-12_134246.png)
+
+### Purpose
+
+**Knowledge base question-answering system** that allows Chloe to retrieve information about the clinic from stored documents.
+
+### How it works:
+
+1. **Webhook Trigger:** Receives question from the main workflow when `getUserDocuments` tool is called
+2. **RAG AI Agent:** Uses a specialized AI agent configured to:
+    - Search the knowledge base using the `Retrieve Documents` tool
+    - Never use its general knowledge - only clinic documents
+    - Synthesize information into helpful answers
+3. **Retrieve Documents Tool:**
+    - Takes the user's question
+    - Searches the Supabase vector database
+    - Returns the top 3 most relevant document chunks
+4. **Supabase Vector Store:**
+    - Database storing clinic documents as embeddings
+    - Uses Google Gemini for embeddings
+    - Enables semantic search (meaning-based, not just keywords)
+5. **Google Gemini Chat Model:** Powers the AI that reads documents and formulates answers
+6. **Response:** Returns answer back to main workflow, which sends it to Vapi
+
+### Example Flow:
+
+- Caller: "What are your clinic hours?"
+- Tool searches knowledge base → Finds hours document
+- AI reads it → "We're open Monday-Friday 8 AM to 6 PM"
+- Answer spoken by Chloe to caller
+
+---
+
+## n8n Workflow #4: "Create and Update Files in Supabase"
+
+![Screenshot 2026-01-12 134134.png](Screenshot_2026-01-12_134134.png)
+
+### Purpose
+
+**Knowledge base management** - automatically processes clinic documents and makes them searchable for the AI.
+
+### How it works:
+
+1. **File Created Trigger:** Watches a Google Drive folder for new documents
+2. **File Updated Trigger:** Watches for edits to existing documents
+3. **Set File ID:** Captures the document's unique identifier
+4. **Delete Old Doc Rows:** Removes previous version from database (for updates)
+5. **Download File:** Gets the document from Google Drive
+6. **Extract Document Text:** Converts PDF/Word/Google Docs to plain text
+7. **Document Processing:**
+    - **Text Splitter:** Breaks document into smaller chunks (better for AI)
+    - **Default Data Loader:** Adds metadata (file ID) to each chunk
+    - **Embeddings:** Converts text to vector embeddings using Google Gemini
+8. **Insert into Supabase:** Stores chunks with embeddings in vector database
+
+### Use Case:
+
+Clinic staff can simply upload a document about "Botox pricing" or "Cancellation policy" to Google Drive, and it automatically becomes available for Chloe to reference when answering caller questions.
+
+---
+
+## n8n Workflow #5: " Delete Duplicates"
+
+![Screenshot 2026-01-12 134307.png](Screenshot_2026-01-12_134307.png)
+
+### Purpose
+
+**Cleanup workflow** that removes deleted files from the knowledge base.
+
+### How it works:
+
+1. **Schedule Trigger:** Runs every 15 minutes
+2. **Parallel Execution:**
+    - Gets all files currently in Google Drive folder
+    - Gets all document records in Supabase database
+3. **Extract File IDs:** Pulls unique identifiers from database records
+4. **Remove Duplicates:** Ensures each file ID appears only once
+5. **Compare Datasets:** Finds records in database that no longer have corresponding files in Drive
+6. **Delete Trashed Doc Rows:** Removes orphaned records from Supabase
+
+### Why needed:
+
+When someone deletes a document from Google Drive, this ensures the knowledge base stays clean and doesn't reference outdated information.
+
+---
+
+## Technical Architecture Summary
+
+### Technology Stack:
+
+- **Vapi:** Voice AI platform handling speech-to-text, AI conversation, text-to-speech
+- **n8n:** Workflow automation connecting all the pieces
+- **Google Calendar:** Appointment scheduling
+- **Google Sheets/HubSpot:** CRM (customer relationship management)
+- **Twilio:** SMS notifications
+- **Supabase:** Vector database for knowledge base
+- **Google Gemini:** AI model for embeddings and RAG
+- **Google Drive:** Document storage
+
+### Data Flow:
+
+```
+Phone Call → Vapi (AI) → n8n Webhook → Business Logic →
+→ Google Calendar/CRM/SMS → Response → Vapi → Caller
+
+```
+
+### Key Innovations:
+
+1. **Multilingual by default** - Not an afterthought
+2. **Context-aware** - Remembers who's calling
+3. **Hybrid CRM** - Works with simple or enterprise systems
+4. **RAG-powered** - AI has accurate, current clinic information
+5. **Automated outreach** - Proactive lead reactivation
+6. **Self-maintaining** - Knowledge base updates automatically
+
+---
+
+##
